@@ -1,0 +1,60 @@
+package com.example.commonwallet.fragments
+
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.example.commonwallet.adapters.PaymentAdapter
+import com.example.commonwallet.adapters.StatAdapter
+import com.example.commonwallet.databinding.FragmentStatsBinding
+import com.example.commonwallet.models.Payment
+import com.example.commonwallet.models.TotalAndNetPaymentStat
+import com.example.commonwallet.viewmodels.StatsViewModel
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class StatsFragment : Fragment() {
+    private lateinit var binding: FragmentStatsBinding
+    private val viewModel: StatsViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        binding = FragmentStatsBinding.inflate(inflater, container, false)
+
+        binding.statsRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.statsRecyclerView.adapter = StatAdapter(listOf())
+
+        val statsObserver = Observer<List<TotalAndNetPaymentStat>> { stats ->
+            val adapter = StatAdapter(stats)
+            println("Stats: $stats")
+            binding.statsRecyclerView.adapter = adapter
+        }
+        viewModel.statistics.observe(viewLifecycleOwner, statsObserver)
+
+        binding.paymentsRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.paymentsRecyclerView.adapter = PaymentAdapter(listOf())
+
+        val paymentsObserver = Observer<List<Payment>> { payments ->
+            val adapter = PaymentAdapter(payments)
+            println("Payments: $payments")
+            binding.paymentsRecyclerView.adapter = adapter
+        }
+        viewModel.latestPayments.observe(viewLifecycleOwner, paymentsObserver)
+
+        val refreshListener = OnRefreshListener { ->
+            viewModel.refresh()
+            binding.swipeRefresh.isRefreshing = false
+        }
+        binding.swipeRefresh.setOnRefreshListener(refreshListener)
+
+        return binding.root
+    }
+}

@@ -1,0 +1,4 @@
+
+class MyApplication : Application() {
+    // ...
+}

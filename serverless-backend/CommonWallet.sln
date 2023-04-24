@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonWallet", "CommonWallet\CommonWallet.csproj", "{BBB4010B-7C9E-48D2-B862-13B36F86F99A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBB4010B-7C9E-48D2-B862-13B36F86F99A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBB4010B-7C9E-48D2-B862-13B36F86F99A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBB4010B-7C9E-48D2-B862-13B36F86F99A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBB4010B-7C9E-48D2-B862-13B36F86F99A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A7ECF17B-C966-4D2B-BC27-14F579D692D5}
+	EndGlobalSection
+EndGlobal
