@@ -1,5 +1,6 @@
 package com.example.commonwallet.data.repository
 
+import android.accounts.NetworkErrorException
 import com.example.commonwallet.database.AppDatabase
 import com.example.commonwallet.models.DescriptionSuggestion
 import com.example.commonwallet.models.NewPayment
@@ -26,7 +27,6 @@ class WalletRepositoryImpl @Inject constructor(
         Payer(2, "Vuk Bibic"),
         Payer(3, "Lazar Minic")
     )*/
-
     private val _cachedDescriptions = mutableListOf<String>() /*mutableListOf(
         "HIT",
         "Mensa",
@@ -34,13 +34,11 @@ class WalletRepositoryImpl @Inject constructor(
         "Eating out",
         "Other"
     )*/
-
     private val _cachedStats = mutableListOf<TotalAndNetPaymentStat>() /*mutableListOf(
         TotalAndNetPaymentStat(1, "Uros Stojkovic", 100.0, 10.0),
         TotalAndNetPaymentStat(2, "Vuk Bibic", 80.0, -10.0),
         TotalAndNetPaymentStat(3, "Lazar Minic", 90.0, 0.0)
     )*/
-
     private val _cachedPayments = mutableListOf<Payment>()
 
     override suspend fun submitNewPayment(payment: NewPayment): Boolean {
@@ -126,18 +124,14 @@ class WalletRepositoryImpl @Inject constructor(
         println("listStats")
         return withContext(Dispatchers.IO) {
             if (refresh || _statsDao.getAll().isEmpty()) {
-                try {
-                    val response = walletApi.listTotalAndNetPayments(walletId)
-                    if (response.isSuccessful) {
-                        _cachedStats.clear()
-                        _cachedStats.addAll(response.body()!!)
-                        _statsDao.deleteAll()
-                        _statsDao.insertAll(_cachedStats)
-                    } else {
-                        println("Failed to fetch stats!")
-                    }
-                } catch (e: Exception) {
-                    println("Exception: ${e.message}")
+                val response = walletApi.listTotalAndNetPayments(walletId)
+                if (response.isSuccessful) {
+                    _cachedStats.clear()
+                    _cachedStats.addAll(response.body()!!)
+                    _statsDao.deleteAll()
+                    _statsDao.insertAll(_cachedStats)
+                } else {
+                    println("Failed to fetch stats!")
                 }
             }
             if (_cachedStats.isEmpty()) {
@@ -153,19 +147,14 @@ class WalletRepositoryImpl @Inject constructor(
         println("listPayments")
         return withContext(Dispatchers.IO) {
             if (refresh || _paymentsDao.getAll().isEmpty()) {
-                try {
-                    val response = walletApi.listLatestPayments(walletId, latestN)
-                    if (response.isSuccessful) {
-                        _cachedPayments.clear()
-                        _cachedPayments.addAll(response.body()!!)
-                        _paymentsDao.deleteAll()
-                        _paymentsDao.insertAll(_cachedPayments)
-                    } else {
-                        println("Failed to fetch stats!")
-                    }
-                }
-                catch (e: Exception) {
-                    println("Exception: ${e.message}")
+                val response = walletApi.listLatestPayments(walletId, latestN)
+                if (response.isSuccessful) {
+                    _cachedPayments.clear()
+                    _cachedPayments.addAll(response.body()!!)
+                    _paymentsDao.deleteAll()
+                    _paymentsDao.insertAll(_cachedPayments)
+                } else {
+                    println("Failed to fetch stats!")
                 }
             }
             if (_cachedPayments.isEmpty()) {

@@ -45,6 +45,8 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
     private val _success = MutableLiveData<Boolean>()
     val success: LiveData<Boolean> = _success
 
+    val failure = MutableLiveData<Boolean>()
+
     init {
         try {
             loadWalletParticipants(defaultWalletId)
@@ -97,8 +99,10 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
             val result = walletRepository.submitNewPayment(payment)
             if (result) {
                 _success.value = true
+                println("Succeeded to submit new payment")
             }
             else {
+                failure.value = true
                 println("Failed to submit new payment!")
             }
         }
