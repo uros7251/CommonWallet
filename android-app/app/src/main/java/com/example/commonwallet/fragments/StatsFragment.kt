@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,9 +52,28 @@ class StatsFragment : Fragment() {
 
         val refreshListener = OnRefreshListener { ->
             viewModel.refresh()
-            binding.swipeRefresh.isRefreshing = false
         }
         binding.swipeRefresh.setOnRefreshListener(refreshListener)
+
+        val successObserver = Observer<Boolean> { success ->
+            if (success) {
+                binding.swipeRefresh.isRefreshing = false
+                viewModel.success.value = false
+                Toast.makeText(requireContext(), "Successful refresh", Toast.LENGTH_SHORT).show()
+                println("Success reload")
+            }
+        }
+        viewModel.success.observe(viewLifecycleOwner, successObserver)
+
+        val failureObserver = Observer<Boolean> { failure ->
+            if (failure) {
+                binding.swipeRefresh.isRefreshing = false
+                viewModel.failure.value = false
+                Toast.makeText(requireContext(), "Failed to refresh. Try again in a minute!", Toast.LENGTH_SHORT).show()
+                println("Failure reload")
+            }
+        }
+        viewModel.failure.observe(viewLifecycleOwner, failureObserver)
 
         return binding.root
     }

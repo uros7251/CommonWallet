@@ -38,9 +38,18 @@ class NewPaymentFragment: Fragment() {
                 Toast.makeText(requireContext(), "Success!", Toast.LENGTH_LONG).show()
                 viewModel.resetFields()
                 binding.descSpinner.setSelection(0)
+                binding.payersSpinner.setSelection(0)
             }
         }
         viewModel.success.observe(viewLifecycleOwner, successObserver)
+
+        val failureObserver = Observer<Boolean> { failure ->
+            if (failure) {
+                Toast.makeText(requireContext(), "Failed to submit! Database may be down, try again in a minute!", Toast.LENGTH_LONG).show()
+                viewModel.failure.value = false
+            }
+        }
+        viewModel.failure.observe(viewLifecycleOwner, failureObserver)
 
         val participantsObserver = Observer<List<Payer>> { participants ->
             val payerSpinnerAdapter = PayerSpinnerAdapter(requireContext(), participants)

@@ -21,6 +21,9 @@ class StatsViewModel @Inject constructor(private val walletRepository: WalletRep
     private val _latestPayments = MutableLiveData<List<Payment>>()
     val latestPayments: LiveData<List<Payment>> = _latestPayments
 
+    val success = MutableLiveData<Boolean>(false)
+    val failure = MutableLiveData<Boolean>(false)
+
     init {
         loadStats()
         loadPayments()
@@ -30,8 +33,12 @@ class StatsViewModel @Inject constructor(private val walletRepository: WalletRep
         viewModelScope.launch {
             try {
                 _statistics.value = walletRepository.listStats(defaultWalletId, refresh).sortedByDescending { it.net }
+                success.value = refresh
             }
-            catch (e: java.lang.Exception) { }
+            catch (e: java.lang.Exception) {
+                println("Exception ${e.message}")
+                failure.value = refresh
+            }
         }
     }
 
@@ -39,8 +46,12 @@ class StatsViewModel @Inject constructor(private val walletRepository: WalletRep
         viewModelScope.launch {
             try {
                 _latestPayments.value = walletRepository.listLatestPayments(defaultWalletId, 10, refresh).sortedByDescending { it.paymentTime.toEpochSecond() }
+                success.value = refresh
             }
-            catch (e: java.lang.Exception) { }
+            catch (e: java.lang.Exception) {
+                println("Exception: ${e.message}")
+                failure.value = refresh
+            }
         }
     }
 
