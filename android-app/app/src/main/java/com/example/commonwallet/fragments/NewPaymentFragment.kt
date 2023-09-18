@@ -11,8 +11,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.commonwallet.adapters.PayerSpinnerAdapter
 import com.example.commonwallet.databinding.FragmentNewPaymentBinding
+import com.example.commonwallet.models.Payer
 import com.example.commonwallet.viewmodels.NewPaymentViewModel
-import com.example.commonwallet.viewmodels.Payer
 import dagger.hilt.android.AndroidEntryPoint
 /**
  * A simple [Fragment] subclass.
@@ -41,7 +41,7 @@ class NewPaymentFragment: Fragment() {
                 binding.payersSpinner.setSelection(0)
             }
         }
-        viewModel.success.observe(viewLifecycleOwner, successObserver)
+        viewModel.submissionSuccessful.observe(viewLifecycleOwner, successObserver)
 
         val failureObserver = Observer<Boolean> { failure ->
             if (failure) {
@@ -59,6 +59,11 @@ class NewPaymentFragment: Fragment() {
         setMoneyInputFilter()
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkOutOfSync()
     }
 
     private fun setMoneyInputFilter() {

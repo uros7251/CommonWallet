@@ -7,6 +7,7 @@ import com.example.commonwallet.databinding.PaymentItemBinding
 import com.example.commonwallet.models.Payment
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 class PaymentAdapter(private val data: List<Payment>)
@@ -21,7 +22,7 @@ class PaymentAdapter(private val data: List<Payment>)
             binding.amount.text = payment.amount.toString()
         }
         private fun getTimeAgo(time: ZonedDateTime): String {
-            val now = ZonedDateTime.now()
+            val now = ZonedDateTime.now(ZoneOffset.UTC)
             val duration = Duration.between(time, now)
             val seconds = duration.seconds
 

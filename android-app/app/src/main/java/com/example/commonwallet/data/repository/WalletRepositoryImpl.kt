@@ -1,16 +1,11 @@
 package com.example.commonwallet.data.repository
 
-import android.accounts.NetworkErrorException
 import com.example.commonwallet.database.AppDatabase
-import com.example.commonwallet.models.DescriptionSuggestion
-import com.example.commonwallet.models.NewPayment
-import com.example.commonwallet.models.Payment
-import com.example.commonwallet.models.TotalAndNetPaymentStat
+import com.example.commonwallet.models.*
 import com.example.commonwallet.network.CommonWalletApiService
-import com.example.commonwallet.viewmodels.Payer
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class WalletRepositoryImpl @Inject constructor(
@@ -21,6 +16,7 @@ class WalletRepositoryImpl @Inject constructor(
     private val _payersDao = localDb.payersDao()
     private val _descriptionsDao = localDb.descriptionSuggestionsDao()
     private val _paymentsDao = localDb.paymentsDao()
+    private val _outstandingPaymentsDao = localDb.outstandingPaymentsDao()
 
     private val _cachedParticipants = mutableListOf<Payer>() /* mutableListOf(
         Payer(1, "Uros Stojkovic"),
@@ -41,14 +37,60 @@ class WalletRepositoryImpl @Inject constructor(
     )*/
     private val _cachedPayments = mutableListOf<Payment>()
 
-    override suspend fun submitNewPayment(payment: NewPayment): Boolean {
-        println("submitNewPayment: $payment")
+    override suspend fun submitNewPayment(outstandingPayment: OutstandingPayment): Boolean {
+        println("submitNewPayment: $outstandingPayment")
         var success = false
         withContext(Dispatchers.IO) {
             try {
-                walletApi.registerNewPayment(payment)
+                _outstandingPaymentsDao.insert(outstandingPayment)
+                var payment = Payment(
+                    _paymentsDao.nextId(),
+                    _payersDao.getPayerName(outstandingPayment.payerId).substringBefore(' '),
+                    ZonedDateTime.now(),
+                    outstandingPayment.amount,
+                    outstandingPayment.description
+                )
+                _paymentsDao.insert(payment)
                 success = true
             } catch (e: Exception) {
+                println(e.message)
+            }
+        }
+        return success
+    }
+
+    override suspend fun anyOutstandingPayment(walletId: Int): Boolean {
+        println("anyOutstandingPayment($walletId)")
+        var result = false
+        withContext(Dispatchers.IO) {
+            try {
+                result = _outstandingPaymentsDao.getAll(walletId).isNotEmpty()
+            }
+            catch (e: Exception) {
+                println(e.message)
+            }
+        }
+        return result
+    }
+
+    override suspend fun uploadOutstandingPayments(walletId: Int): Boolean {
+        // TODO("Not yet implemented")
+        println("uploadOutstandingPayments()")
+        var success = true
+        withContext(Dispatchers.IO) {
+            try {
+                val outstandingPayments = _outstandingPaymentsDao.getAll(walletId)
+                var n: Int = 0
+                for (p in outstandingPayments) {
+                    val response = walletApi.registerNewPayment(p)
+                    if (response.isSuccessful) {
+                        _outstandingPaymentsDao.delete(p)
+                        ++n
+                    }
+                }
+                success = n == outstandingPayments.size
+            }
+            catch (e: Exception) {
                 println(e.message)
             }
         }
@@ -157,7 +199,7 @@ class WalletRepositoryImpl @Inject constructor(
                     println("Failed to fetch stats!")
                 }
             }
-            if (_cachedPayments.isEmpty()) {
+            if (true || _cachedPayments.isEmpty()) {
                 println("Reading from local data store")
                 _cachedPayments.clear()
                 val result = withContext(Dispatchers.IO) {

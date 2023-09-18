@@ -45,6 +45,9 @@ class StatsViewModel @Inject constructor(private val walletRepository: WalletRep
     private fun loadPayments(refresh: Boolean = false) {
         viewModelScope.launch {
             try {
+                if (refresh && walletRepository.anyOutstandingPayment(defaultWalletId)) {
+                    walletRepository.uploadOutstandingPayments(defaultWalletId)
+                }
                 _latestPayments.value = walletRepository.listLatestPayments(defaultWalletId, 10, refresh).sortedByDescending { it.paymentTime.toEpochSecond() }
                 success.value = refresh
             }
@@ -56,8 +59,14 @@ class StatsViewModel @Inject constructor(private val walletRepository: WalletRep
     }
 
     fun refresh() {
+        // contacts backend
         loadStats(true)
         loadPayments(true)
+    }
+
+    fun refreshPaymentList() {
+        // doesn't communicate with backend
+        loadPayments(false)
     }
 
     companion object {

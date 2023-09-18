@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.commonwallet.database.AppDatabase
 import com.example.commonwallet.deserializers.ZonedDateTimeDeserializer
+import com.example.commonwallet.deserializers.ZonedDateTimeSerializer
 import com.example.commonwallet.network.CommonWalletApiService
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -26,6 +27,7 @@ object DataSourcesModule {
     fun provideCommonWalletApiService(): CommonWalletApiService {
         val gson = GsonBuilder()
             .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeDeserializer())
+            .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeSerializer())
             .create()
 
         val interceptor = Interceptor { chain ->
@@ -48,8 +50,8 @@ object DataSourcesModule {
             .build()
 
         val retrofit = Retrofit.Builder()
-            //.baseUrl("http://10.0.2.2:7065/api/")
-            .baseUrl(Secrets.URL)
+            .baseUrl("http://10.0.2.2:7065/api/")
+            //.baseUrl(Secrets.URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

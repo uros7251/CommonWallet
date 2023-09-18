@@ -4,21 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.example.commonwallet.data.repository.WalletRepository
-import com.example.commonwallet.models.NewPayment
+import com.example.commonwallet.models.OutstandingPayment
+import com.example.commonwallet.models.Payer
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import javax.inject.Inject
-
-@Entity
-data class Payer(
-    @PrimaryKey val id: Int,
-    val name: String
-)
 
 @HiltViewModel
 class NewPaymentViewModel @Inject constructor(private val walletRepository: WalletRepository) : ViewModel() {
@@ -42,15 +35,18 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
     private val _customDescriptionEnabled = MutableLiveData<Boolean>(false)
     val customDescriptionEnabled: LiveData<Boolean> = _customDescriptionEnabled
 
-    private val _success = MutableLiveData<Boolean>()
-    val success: LiveData<Boolean> = _success
+    private val _submissionSuccessful = MutableLiveData<Boolean>()
+    val submissionSuccessful: LiveData<Boolean> = _submissionSuccessful
 
     val failure = MutableLiveData<Boolean>()
+
+    val outOfSync = MutableLiveData<Boolean>()
 
     init {
         try {
             loadWalletParticipants(defaultWalletId)
             loadDescriptionSuggestions(defaultWalletId)
+            checkOutOfSync(defaultWalletId)
         }
         catch (e: Exception) { }
         resetFields()
@@ -68,6 +64,12 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
         }
     }
 
+    fun checkOutOfSync(walletId: Int = defaultWalletId) {
+        viewModelScope.launch {
+            outOfSync.value = walletRepository.anyOutstandingPayment(walletId)
+        }
+    }
+
     fun resetFields() {
         if (!participants.value.isNullOrEmpty()) {
             _selectedPayer.value = participants.value!![0]
@@ -77,7 +79,7 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
         }
         selectedAmount.value = ""
         customDescription.value = ""
-        _success.value = false
+        _submissionSuccessful.value = false
     }
 
     fun onPayerSelected(position: Int) {
@@ -91,19 +93,32 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
 
     fun submitNewPayment() {
         viewModelScope.launch {
-            val payment = NewPayment(
+            val utcNow = ZonedDateTime.now(ZoneOffset.UTC)
+            val payment = OutstandingPayment(
+                0,
                 defaultWalletId,
                 selectedPayer.value!!.id,
+                utcNow,
                 selectedAmount.value!!.toDouble(),
                 if (selectedDescription.value!! == "Other") customDescription.value!! else selectedDescription.value!!)
             val result = walletRepository.submitNewPayment(payment)
             if (result) {
-                _success.value = true
+                _submissionSuccessful.value = true
+                outOfSync.value = true
                 println("Succeeded to submit new payment")
             }
             else {
                 failure.value = true
                 println("Failed to submit new payment!")
+            }
+        }
+    }
+
+    fun uploadOutstandingPayments() {
+        viewModelScope.launch {
+            val result = walletRepository.uploadOutstandingPayments(defaultWalletId)
+            if (result) {
+                outOfSync.value = false
             }
         }
     }

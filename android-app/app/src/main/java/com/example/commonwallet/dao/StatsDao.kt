@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.commonwallet.models.TotalAndNetPaymentStat
-import com.example.commonwallet.viewmodels.Payer
+import com.example.commonwallet.models.Payer
 
 @Dao
 interface StatsDao {

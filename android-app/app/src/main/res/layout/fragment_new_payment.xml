@@ -98,11 +98,24 @@
             android:id="@+id/submit_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:onClick="@{() -> viewModel.submitNewPayment()}"
             android:text="Submit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/descSpinner"
-            app:layout_constraintStart_toStartOf="@+id/descSpinner" />
+            app:layout_constraintStart_toEndOf="@+id/button" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:onClick="@{() -> viewModel.uploadOutstandingPayments()}"
+            android:text="Sync"
+            android:visibility="@{viewModel.outOfSync ? View.VISIBLE : View.GONE}"
+            app:icon="@android:drawable/ic_popup_sync"
+            app:layout_constraintBottom_toBottomOf="@+id/submit_button"
+            app:layout_constraintStart_toStartOf="@+id/descSpinner"
+            app:layout_constraintTop_toTopOf="@+id/submit_button" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

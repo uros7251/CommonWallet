@@ -1,15 +1,15 @@
 package com.example.commonwallet.network
 
-import com.example.commonwallet.models.NewPayment
+import com.example.commonwallet.models.OutstandingPayment
+import com.example.commonwallet.models.Payer
 import com.example.commonwallet.models.Payment
 import com.example.commonwallet.models.TotalAndNetPaymentStat
-import com.example.commonwallet.viewmodels.Payer
 import retrofit2.Response
 import retrofit2.http.*
 
 interface CommonWalletApiService {
     @POST("newpayment")
-    suspend fun registerNewPayment(@Body payment: NewPayment): Response<Unit>
+    suspend fun registerNewPayment(@Body payment: OutstandingPayment): Response<Unit>
 
     @GET("wallet/{wallet_id}/stats")
     suspend fun listTotalAndNetPayments(@Path("wallet_id") walletId: Int): Response<List<TotalAndNetPaymentStat>>

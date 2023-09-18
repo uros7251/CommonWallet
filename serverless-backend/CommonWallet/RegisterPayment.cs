@@ -17,13 +17,14 @@ namespace CommonWallet
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "newpayment")]
             HttpRequest req,
-            [Sql(commandText:"dbo.Payment", connectionStringSetting:"SqlConnectionString")] IAsyncCollector<NewPayment> payments,
+            [Sql(commandText: "dbo.Payment", connectionStringSetting: "SqlConnectionString")] IAsyncCollector<NewPayment> payments,
             ILogger log)
         {
             log.LogInformation("RegisterPayment function processed a request");
             var jsonString = await new StreamReader(req.Body).ReadToEndAsync();
+            log.LogInformation(jsonString);
             NewPayment payment = JsonConvert.DeserializeObject<NewPayment>(jsonString);
-            log.LogInformation($"New payment: {payment}");
+            log.LogInformation($"New payment: {payment.payment_time}");
             await payments.AddAsync(payment);
             await payments.FlushAsync();
             return new OkResult();

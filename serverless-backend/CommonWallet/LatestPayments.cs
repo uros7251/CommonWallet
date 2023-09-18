@@ -25,11 +25,11 @@ namespace CommonWallet
         [FunctionName("LatestPayments")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "wallet/{wallet_id}/payments")] HttpRequest req,
-			[Sql(commandText: "SELECT TOP(CAST(@n AS INT)) pay.payment_id AS payment_id, p.first_name AS payer_name, pay.description AS description, pay.amount AS amount, pay.payment_time AS payment_time FROM payment pay, person p where wallet_id = @WalletId AND pay.payer_id = p.person_id ORDER BY pay.payment_time DESC",
-				commandType: System.Data.CommandType.Text,
-				parameters: "@WalletId={wallet_id},@n={Query.n}",
-				connectionStringSetting: "SqlConnectionString")] IEnumerable<Payment> latestPayments,
-			ILogger log)
+            [Sql(commandText: "SELECT TOP(CAST(@n AS INT)) pay.payment_id AS payment_id, p.first_name AS payer_name, pay.description AS description, pay.amount AS amount, pay.payment_time AS payment_time FROM payment pay, person p where wallet_id = @WalletId AND pay.payer_id = p.person_id ORDER BY pay.payment_time DESC",
+                commandType: System.Data.CommandType.Text,
+                parameters: "@WalletId={wallet_id},@n={Query.n}",
+                connectionStringSetting: "SqlConnectionString")] IEnumerable<Payment> latestPayments,
+            ILogger log)
 		{
             log.LogInformation("LatestPayments function processed a request.");
             log.LogInformation($"Latest payments: {latestPayments}");

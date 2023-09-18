@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.commonwallet.viewmodels.Payer
+import com.example.commonwallet.models.Payer
 
 @Dao
 interface PayersDao {
@@ -16,4 +16,7 @@ interface PayersDao {
 
     @Query("DELETE FROM payer")
     suspend fun deleteAll()
+
+    @Query("SELECT name FROM payer WHERE id = :payerId")
+    suspend fun getPayerName(payerId: Int): String
 }
