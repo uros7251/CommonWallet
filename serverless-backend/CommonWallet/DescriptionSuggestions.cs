@@ -15,12 +15,12 @@ namespace CommonWallet
     {
         private static readonly List<string> descriptionSuggestions = new List<string>
         {
-            "HIT",
-            "Mensa",
-            "Eating Out",
-            "Drinking Out",
-            "Other"
-        };
+			"\uD83D\uDED2 HIT",
+			"\uD83C\uDF5B Mensa",
+			"\uD83C\uDF2F Eating Out",
+			"\uD83C\uDF7B Drinking Out",
+			"\u270D\uFE0F Other"
+		};
 
         [FunctionName("DescriptionSuggestions")]
         public static async Task<IActionResult> Run(

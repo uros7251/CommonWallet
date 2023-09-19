@@ -74,8 +74,7 @@ class WalletRepositoryImpl @Inject constructor(
     }
 
     override suspend fun uploadOutstandingPayments(walletId: Int): Boolean {
-        // TODO("Not yet implemented")
-        println("uploadOutstandingPayments()")
+        println("uploadOutstandingPayments($walletId)")
         var success = true
         withContext(Dispatchers.IO) {
             try {

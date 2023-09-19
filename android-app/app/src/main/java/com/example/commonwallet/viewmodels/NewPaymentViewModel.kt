@@ -87,7 +87,7 @@ class NewPaymentViewModel @Inject constructor(private val walletRepository: Wall
     }
 
     fun onDescriptionSuggestionSelected(position: Int) {
-        selectedDescription.value = _descriptionSuggestions.value!![position]
+        selectedDescription.value = _descriptionSuggestions.value!![position].substringAfter(' ')
         _customDescriptionEnabled.value = selectedDescription.value == "Other"
     }
 

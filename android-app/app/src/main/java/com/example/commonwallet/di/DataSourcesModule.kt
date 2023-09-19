@@ -50,8 +50,8 @@ object DataSourcesModule {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:7065/api/")
-            //.baseUrl(Secrets.URL)
+            //.baseUrl("http://10.0.2.2:7065/api/")
+            .baseUrl(Secrets.URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
