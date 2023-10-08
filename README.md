@@ -10,6 +10,6 @@
  - (there's also a super simple React frontend)
  ## Sneak peek
 <div style="display: flex; justify-content: space-around;">
-    <img src="./screenshots/screenshot-newpayment.jpg" width="45%" />
-    <img src="./screenshots/screenshot-stats.jpg" width="45%"/>
+    <img src="./screenshots/Screenshot_CommonWallet_NewPayment.jpg" width="45%" />
+    <img src="./screenshots/Screenshot_CommonWallet_Stats.jpg" width="45%"/>
 </div>
